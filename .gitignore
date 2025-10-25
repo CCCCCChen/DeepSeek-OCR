@@ -1,0 +1,5 @@
+# 忽略wget-log文件
+wget-log
+
+# 忽略CUsershchch文件夹
+CUsershchch/
