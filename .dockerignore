@@ -1,0 +1,45 @@
+.git
+.gitignore
+.vscode/
+.idea/
+
+# Python cache and build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+env/
+envs/
+*/.venv/
+*/venv/
+*/env/
+*/envs/
+
+# Large or local-only data
+assets/
+data/
+datasets/
+cache/
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.tiff
+*.bmp
+
+# Node/JS
+node_modules/
+
+# Logs and temp
+*.log
+*.tmp
+*.swp

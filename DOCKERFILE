@@ -1,0 +1,42 @@
+# 基础镜像：CUDA 12.4 + Ubuntu 22.04
+FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    cmake \
+    git \
+    ninja-build \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装 PyTorch (CUDA 12.4)
+RUN python3 -m pip install --no-cache-dir -U pip setuptools wheel \
+    && pip3 install --no-cache-dir torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+
+# 安装 vLLM (CUDA 12.4 + Python 3.11)
+RUN pip3 install --no-cache-dir vllm==0.8.5+cu124 --extra-index-url https://download.pytorch.org/whl/cu124 || \
+    pip3 install --no-cache-dir -U vllm --pre --extra-index-url https://wheels.vllm.ai/nightly
+
+# 安装 FlashAttention
+RUN pip3 install --no-cache-dir flash-attn==2.7.3 --no-build-isolation
+
+# 安装 DeepSeek-OCR 依赖
+RUN pip3 install --no-cache-dir transformers>=4.51.1 accelerate pillow pymupdf img2pdf tqdm einops addict numpy
+
+# 克隆 DeepSeek-OCR 代码
+COPY . .
+
+# 下载模型（可选，也可以在运行时自动下载）
+RUN python3 -c "from transformers import AutoModel; AutoModel.from_pretrained('deepseek-ai/DeepSeek-OCR', trust_remote_code=True)"
+
+# 暴露端口（如果需要 API 服务）
+EXPOSE 8000
+
+# 运行示例命令
+CMD ["python3", "DeepSeek-OCR-master/DeepSeek-OCR-vllm/run_dpsk_ocr_pdf.py", "--input", "/app/data/input.pdf", "--output", "/app/data/output.json"]
